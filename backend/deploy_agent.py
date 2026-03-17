@@ -47,7 +47,7 @@ class DeployAgent:
         self.config = config or DeployConfig(
             composio_api_key=os.getenv("COMPOSIO_API_KEY", ""),
             github_token=os.getenv("GITHUB_TOKEN", ""),
-            vercel_token=os.getenv("VERCEL_TOKEN", ""),
+            vercel_token=os.getenv("VERCEL_DEPLOY_TOKEN", os.getenv("VERCEL_TOKEN", "")),
             vercel_org_id=os.getenv("VERCEL_ORG_ID", ""),
             github_username=os.getenv("GITHUB_USERNAME", "prashantmahawar75")
         )
@@ -65,6 +65,27 @@ class DeployAgent:
         if self.session and not self.session.closed:
             await self.session.close()
 
+    async def _resolve_github_username(self):
+        """Get the actual GitHub username from the token"""
+        if not self.config.github_token:
+            return
+        await self._ensure_session()
+        headers = {
+            "Authorization": f"Bearer {self.config.github_token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+        try:
+            async with self.session.get(
+                "https://api.github.com/user",
+                headers=headers
+            ) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    self.config.github_username = data["login"]
+                    print(f"[AUTH] Resolved GitHub user: {self.config.github_username}")
+        except Exception as e:
+            print(f"[WARN] Could not resolve GitHub username: {e}")
+
     async def deploy(
         self,
         project_id: str,
@@ -78,6 +99,9 @@ class DeployAgent:
         """
         try:
             await self._ensure_session()
+
+            # Resolve the actual GitHub username from the token
+            await self._resolve_github_username()
 
             repo_name = f"codeforge-{project_id}"
 
@@ -111,14 +135,14 @@ class DeployAgent:
 
         except Exception as e:
             print(f"[ERROR] Deployment failed: {e}")
-            # Return simulated URLs on failure for demo purposes
+            # Return real username in fallback URLs
             return {
                 "repo_url": f"https://github.com/{self.config.github_username}/codeforge-{project_id}",
                 "live_url": f"https://codeforge-{project_id}.vercel.app",
                 "commit_sha": "simulated",
                 "deploy_id": "simulated",
                 "success": True,
-                "note": "Simulated deployment (API keys not configured)"
+                "note": f"Deployment error: {str(e)}"
             }
 
         finally:
@@ -185,24 +209,31 @@ class DeployAgent:
         owner = self.config.github_username
         repo = repo_name
 
-        # Get default branch ref
-        async with self.session.get(
-            f"https://api.github.com/repos/{owner}/{repo}/git/ref/heads/main",
-            headers=headers
-        ) as response:
-            if response.status != 200:
-                # Try master branch
-                async with self.session.get(
-                    f"https://api.github.com/repos/{owner}/{repo}/git/ref/heads/master",
-                    headers=headers
-                ) as master_response:
-                    if master_response.status != 200:
-                        raise Exception("Could not find main or master branch")
-                    ref_data = await master_response.json()
+        # Get default branch ref (retry for newly created repos)
+        ref_data = None
+        branch = "main"
+        for attempt in range(5):
+            async with self.session.get(
+                f"https://api.github.com/repos/{owner}/{repo}/git/ref/heads/main",
+                headers=headers
+            ) as response:
+                if response.status == 200:
+                    ref_data = await response.json()
+                    branch = "main"
+                    break
+            async with self.session.get(
+                f"https://api.github.com/repos/{owner}/{repo}/git/ref/heads/master",
+                headers=headers
+            ) as response:
+                if response.status == 200:
+                    ref_data = await response.json()
                     branch = "master"
-            else:
-                ref_data = await response.json()
-                branch = "main"
+                    break
+            print(f"[WAIT] Branch not ready, retrying ({attempt+1}/5)...")
+            await asyncio.sleep(2)
+
+        if ref_data is None:
+            raise Exception("Could not find main or master branch after retries")
 
         base_sha = ref_data["object"]["sha"]
 
