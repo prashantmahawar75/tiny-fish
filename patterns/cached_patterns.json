@@ -1,0 +1,238 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2024-03-15",
+    "description": "Pre-cached patterns extracted from live websites for offline/fallback use"
+  },
+  "twitter_clone": {
+    "ui_components": [
+      "Timeline",
+      "PostCard",
+      "TweetComposer",
+      "UserProfile",
+      "Sidebar",
+      "TrendingTopics",
+      "SearchBar",
+      "NotificationBell",
+      "FollowButton",
+      "LikeButton",
+      "ReplyThread",
+      "MediaUploader"
+    ],
+    "api_patterns": {
+      "timeline": {
+        "endpoint": "/api/posts/timeline",
+        "method": "GET",
+        "pagination": "cursor-based"
+      },
+      "create_post": {
+        "endpoint": "/api/posts",
+        "method": "POST",
+        "body": ["content", "mediaUrls"]
+      },
+      "like": {
+        "endpoint": "/api/posts/:id/like",
+        "method": "POST"
+      },
+      "follow": {
+        "endpoint": "/api/users/:id/follow",
+        "method": "POST"
+      }
+    },
+    "database_schema": {
+      "User": ["id", "username", "email", "name", "bio", "avatar", "createdAt"],
+      "Post": ["id", "content", "authorId", "mediaUrls", "likesCount", "retweetsCount", "createdAt"],
+      "Like": ["id", "userId", "postId", "createdAt"],
+      "Follow": ["id", "followerId", "followingId", "createdAt"]
+    },
+    "design_tokens": {
+      "primary": "#1DA1F2",
+      "secondary": "#14171A",
+      "background": "#FFFFFF",
+      "surface": "#F5F8FA"
+    }
+  },
+  "instagram_clone": {
+    "ui_components": [
+      "Feed",
+      "ReelPlayer",
+      "StoryRing",
+      "PhotoGrid",
+      "PostCreator",
+      "CommentDrawer",
+      "LikeAnimation",
+      "ProfileHeader",
+      "BottomNav",
+      "DirectMessages",
+      "ExploreGrid",
+      "FilterCarousel"
+    ],
+    "api_patterns": {
+      "feed": {
+        "endpoint": "/api/feed",
+        "method": "GET",
+        "pagination": "cursor-based"
+      },
+      "reels": {
+        "endpoint": "/api/reels",
+        "method": "GET"
+      },
+      "upload": {
+        "endpoint": "/api/upload",
+        "method": "POST",
+        "type": "multipart"
+      }
+    },
+    "database_schema": {
+      "User": ["id", "username", "email", "name", "bio", "avatar", "isVerified"],
+      "Post": ["id", "authorId", "mediaUrls", "caption", "likesCount", "commentsCount"],
+      "Story": ["id", "authorId", "mediaUrl", "expiresAt", "viewCount"],
+      "Reel": ["id", "authorId", "videoUrl", "caption", "audioId", "viewCount"]
+    },
+    "design_tokens": {
+      "primary": "#833AB4",
+      "secondary": "#E1306C",
+      "accent": "#FCAF45",
+      "background": "#FAFAFA"
+    }
+  },
+  "ecommerce": {
+    "ui_components": [
+      "ProductGrid",
+      "ProductCard",
+      "CartDrawer",
+      "CheckoutForm",
+      "PaymentModal",
+      "CategoryNav",
+      "SearchFilters",
+      "PriceTag",
+      "OrderSummary",
+      "AddressForm",
+      "ReviewCard",
+      "WishlistButton"
+    ],
+    "api_patterns": {
+      "products": {
+        "endpoint": "/api/products",
+        "method": "GET",
+        "filters": ["category", "price", "sort"]
+      },
+      "cart": {
+        "endpoint": "/api/cart",
+        "method": "GET/POST/DELETE"
+      },
+      "checkout": {
+        "endpoint": "/api/checkout",
+        "method": "POST"
+      },
+      "payment": {
+        "endpoint": "/api/payments/razorpay",
+        "method": "POST"
+      }
+    },
+    "database_schema": {
+      "User": ["id", "email", "name", "phone"],
+      "Product": ["id", "name", "description", "price", "discountPrice", "images", "categoryId", "stock"],
+      "Category": ["id", "name", "slug", "parentId"],
+      "Order": ["id", "userId", "status", "total", "addressId", "paymentId"],
+      "CartItem": ["id", "userId", "productId", "quantity"]
+    },
+    "design_tokens": {
+      "primary": "#FF6B6B",
+      "secondary": "#4ECDC4",
+      "accent": "#FFE66D",
+      "background": "#FFFFFF"
+    }
+  },
+  "notion_clone": {
+    "ui_components": [
+      "BlockEditor",
+      "PageTree",
+      "SlashCommand",
+      "DragHandle",
+      "Breadcrumb",
+      "ShareModal",
+      "TableBlock",
+      "KanbanView",
+      "CalendarView",
+      "CommentThread",
+      "CoverImage",
+      "EmojiPicker"
+    ],
+    "api_patterns": {
+      "pages": {
+        "endpoint": "/api/pages/:id",
+        "method": "GET/PATCH"
+      },
+      "blocks": {
+        "endpoint": "/api/blocks",
+        "method": "POST/PATCH/DELETE"
+      },
+      "share": {
+        "endpoint": "/api/pages/:id/share",
+        "method": "POST"
+      },
+      "realtime": {
+        "endpoint": "wss://realtime",
+        "protocol": "websocket"
+      }
+    },
+    "database_schema": {
+      "User": ["id", "email", "name", "avatar"],
+      "Workspace": ["id", "name", "icon"],
+      "Page": ["id", "workspaceId", "parentId", "title", "icon", "cover"],
+      "Block": ["id", "pageId", "type", "content", "order"],
+      "Permission": ["id", "pageId", "userId", "level"]
+    },
+    "design_tokens": {
+      "primary": "#000000",
+      "secondary": "#37352F",
+      "accent": "#2383E2",
+      "background": "#FFFFFF"
+    }
+  },
+  "job_board": {
+    "ui_components": [
+      "JobCard",
+      "JobList",
+      "ApplicationForm",
+      "ProfileHeader",
+      "ExperienceCard",
+      "SkillBadge",
+      "CompanyLogo",
+      "SearchFilters",
+      "SavedJobs",
+      "ApplicationStatus",
+      "ResumeUploader",
+      "EducationCard"
+    ],
+    "api_patterns": {
+      "jobs": {
+        "endpoint": "/api/jobs",
+        "method": "GET",
+        "filters": ["location", "type", "salary", "skills"]
+      },
+      "apply": {
+        "endpoint": "/api/jobs/:id/apply",
+        "method": "POST"
+      },
+      "profile": {
+        "endpoint": "/api/profile",
+        "method": "GET/PATCH"
+      }
+    },
+    "database_schema": {
+      "User": ["id", "email", "name", "headline", "bio", "resumeUrl", "skills"],
+      "Company": ["id", "name", "logo", "description", "website", "size", "industry"],
+      "Job": ["id", "companyId", "title", "description", "location", "type", "salary", "skills"],
+      "Application": ["id", "userId", "jobId", "status", "resumeUrl", "coverLetter"],
+      "Experience": ["id", "userId", "company", "title", "startDate", "endDate", "description"]
+    },
+    "design_tokens": {
+      "primary": "#0A66C2",
+      "secondary": "#5E5E5E",
+      "accent": "#057642",
+      "background": "#F3F2EF"
+    }
+  }
+}

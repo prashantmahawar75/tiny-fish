@@ -1,0 +1,49 @@
+# Agentic CodeForge - Docker Compose
+# For local development
+
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - TINYFISH_API_KEY=${TINYFISH_API_KEY}
+      - FIREWORKS_API_KEY=${FIREWORKS_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_USERNAME=${GITHUB_USERNAME}
+      - VERCEL_TOKEN=${VERCEL_TOKEN}
+      - VERCEL_ORG_ID=${VERCEL_ORG_ID}
+      - COMPOSIO_API_KEY=${COMPOSIO_API_KEY}
+      - CORS_ORIGINS=http://localhost:3000
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+
+networks:
+  default:
+    name: codeforge-network
