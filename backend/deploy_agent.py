@@ -115,7 +115,7 @@ class DeployAgent:
 
             # Step 3: Deploy to Vercel
             print("[STARTUP] Deploying to Vercel...")
-            live_url, deploy_id = await self._deploy_to_vercel(repo_name, repo_url)
+            live_url, deploy_id = await self._deploy_to_vercel(repo_name, repo_url, generated_code)
 
             result = DeployResult(
                 repo_url=repo_url,
@@ -318,8 +318,8 @@ class DeployAgent:
 
         return commit_data["sha"]
 
-    async def _deploy_to_vercel(self, repo_name: str, repo_url: str) -> tuple[str, str]:
-        """Deploy to Vercel via API"""
+    async def _deploy_to_vercel(self, repo_name: str, repo_url: str, generated_code: dict[str, str] = None) -> tuple[str, str]:
+        """Deploy to Vercel via file upload API"""
         if not self.config.vercel_token:
             return (f"https://{repo_name}.vercel.app", "simulated-deploy-id")
 
@@ -328,57 +328,27 @@ class DeployAgent:
             "Content-Type": "application/json"
         }
 
-        # Check if project exists
-        async with self.session.get(
-            f"https://api.vercel.com/v9/projects/{repo_name}",
-            headers=headers
-        ) as response:
-            if response.status == 200:
-                project_data = await response.json()
-                project_id = project_data["id"]
-            else:
-                # Create new project
-                project_payload = {
-                    "name": repo_name,
-                    "framework": "nextjs",
-                    "gitRepository": {
-                        "repo": f"{self.config.github_username}/{repo_name}",
-                        "type": "github"
-                    },
-                    "buildCommand": "npm run build",
-                    "outputDirectory": ".next",
-                    "installCommand": "npm install",
-                    "devCommand": "npm run dev"
-                }
+        # Build query string for team/org scope
+        team_query = f"?teamId={self.config.vercel_org_id}" if self.config.vercel_org_id else ""
 
-                if self.config.vercel_org_id:
-                    project_payload["teamId"] = self.config.vercel_org_id
+        # Build files array for Vercel deployment
+        files = []
+        if generated_code:
+            for file_path, content in generated_code.items():
+                files.append({"file": file_path, "data": content})
 
-                async with self.session.post(
-                    "https://api.vercel.com/v10/projects",
-                    headers=headers,
-                    json=project_payload
-                ) as create_response:
-                    if create_response.status not in [200, 201]:
-                        error = await create_response.text()
-                        raise Exception(f"Failed to create Vercel project: {error}")
-                    project_data = await create_response.json()
-                    project_id = project_data["id"]
-
-        # Trigger deployment
+        # Deploy with inline files
         deploy_payload = {
             "name": repo_name,
-            "project": project_id,
+            "files": files,
             "target": "production",
-            "gitSource": {
-                "type": "github",
-                "repo": f"{self.config.github_username}/{repo_name}",
-                "ref": "main"
+            "projectSettings": {
+                "framework": None
             }
         }
 
         async with self.session.post(
-            "https://api.vercel.com/v13/deployments",
+            f"https://api.vercel.com/v13/deployments{team_query}",
             headers=headers,
             json=deploy_payload
         ) as response:

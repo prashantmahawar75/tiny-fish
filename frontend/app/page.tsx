@@ -176,6 +176,12 @@ export default function Dashboard() {
               Describe your app in plain English. Our AI agents extract patterns from live websites
               and generate production-ready code deployed to Vercel.
             </p>
+            <a
+              href="/mvp"
+              className="inline-flex items-center px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors"
+            >
+              Open 5 Hardcoded MVP Clones
+            </a>
           </div>
 
           {/* Input Section */}
