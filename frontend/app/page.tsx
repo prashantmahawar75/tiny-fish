@@ -54,7 +54,7 @@ export default function Dashboard() {
   const [copied, setCopied] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://backend-29vujjht3-prashants-projects-6a7a6282.vercel.app";
 
   const handleGenerate = async () => {
     if (!spec.trim() || !email.trim()) return;
