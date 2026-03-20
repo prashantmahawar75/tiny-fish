@@ -20,28 +20,28 @@ type Tip = {
 const projectLinks = [
   {
     name: "Twitter Clone",
-    github: process.env.NEXT_PUBLIC_TWITTER_GITHUB || "",
-    live: process.env.NEXT_PUBLIC_TWITTER_LIVE || "",
+    github: "https://github.com/prashantmahawar75/tiny-fish/blob/main/frontend/app/mvp/page.tsx",
+    live: "https://frontend-ce203c3zh-prashants-projects-6a7a6282.vercel.app/mvp#twitter",
   },
   {
     name: "Instagram Reels + UPI",
-    github: process.env.NEXT_PUBLIC_REELS_GITHUB || "",
-    live: process.env.NEXT_PUBLIC_REELS_LIVE || "",
+    github: "https://github.com/prashantmahawar75/tiny-fish/blob/main/frontend/app/api/mvp/reels-tip/route.ts",
+    live: "https://frontend-ce203c3zh-prashants-projects-6a7a6282.vercel.app/mvp#reels",
   },
   {
     name: "Meesho Social Commerce",
-    github: process.env.NEXT_PUBLIC_MEESHO_GITHUB || "",
-    live: process.env.NEXT_PUBLIC_MEESHO_LIVE || "",
+    github: "https://github.com/prashantmahawar75/tiny-fish/blob/main/frontend/app/mvp/page.tsx#L239",
+    live: "https://frontend-ce203c3zh-prashants-projects-6a7a6282.vercel.app/mvp#meesho",
   },
   {
     name: "Notion Collaborative Docs",
-    github: process.env.NEXT_PUBLIC_DOCS_GITHUB || "",
-    live: process.env.NEXT_PUBLIC_DOCS_LIVE || "",
+    github: "https://github.com/prashantmahawar75/tiny-fish/blob/main/frontend/app/api/mvp/docs/route.ts",
+    live: "https://frontend-ce203c3zh-prashants-projects-6a7a6282.vercel.app/mvp#docs",
   },
   {
     name: "LinkedIn for GGSIPU",
-    github: process.env.NEXT_PUBLIC_LINKEDIN_GITHUB || "",
-    live: process.env.NEXT_PUBLIC_LINKEDIN_LIVE || "",
+    github: "https://github.com/prashantmahawar75/tiny-fish/blob/main/frontend/app/api/mvp/linkedin/route.ts",
+    live: "https://frontend-ce203c3zh-prashants-projects-6a7a6282.vercel.app/mvp#linkedin",
   },
 ];
 
