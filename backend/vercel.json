@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "name": "agentic-codeforge-backend",
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "main.py"
+    }
+  ],
+  "regions": ["bom1"],
+  "env": {
+    "TINYFISH_API_KEY": "@tinyfish_api_key",
+    "FIREWORKS_API_KEY": "@fireworks_api_key",
+    "GITHUB_TOKEN": "@github_token",
+    "VERCEL_TOKEN": "@vercel_token",
+    "VERCEL_ORG_ID": "@vercel_org_id"
+  }
+}
